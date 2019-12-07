@@ -1,78 +1,52 @@
-### The library is inspired by [Skeleton](https://github.com/gonzalonunez/Skeleton)
+### Modified based on [OCSkeleton](https://github.com/mayqiyue/OCSkeleton)
 
+Add a category of SomoDataSourceProvider for UICollectionView, it is just a simple implementation. You can continue to improve according to your specific needs.
 
-<p align="center">
-    <img src="logo.png" width="300" max-width="50%" alt="Skeleton" />
-</p>
+## 👩‍💻UICollectionView Usage
 
-<p align="center">
-    <a href="http://cocoapods.org/pods/OCSkeleton">
-        <img src="https://img.shields.io/cocoapods/p/OCSkeleton.svg?style=flat" />
-    </a>
-    <a href="http://cocoapods.org/pods/OCSkeleton">
-        <img src="https://img.shields.io/cocoapods/l/OCSkeleton.svg?style=flat" />
-    </a>
-    <a href="http://cocoapods.org/pods/OCSkeleton">
-        <img src="https://img.shields.io/cocoapods/v/OCSkeleton.svg?style=flat" />
-    </a>
-</p>
+### import the Category header file:  \#import \"SomoDataSourceProvider+TCMCollectionView.h\"
 
-![](./skeleton-logo-animation.gif)
-
-## 👩‍💻 Usage
-
-### import the OCSkeleton:  \#import \<OCSkeleton.h\>
-
-#### You can use the *OCGradientLayer* directly:
+#### Use like this below:
 
 ```ObjC
-@interface OCGradientLayer : CAGradientLayer
+@interface ViewController : UIViewController()
 
-- (void)slideToDir:(OCDirection)direction animations:(void (^)(CAAnimationGroup *))group;
+@property (nonatomic, strong) SomoDataSourceProvider *provider;
 
-- (void)stopSliding;
+@end
+@implementation ViewController
+
+- (void)viewDidLoad{
+    [super viewDidLoad];
+    
+    _provider = [SomoDataSourceProvider dataSourceProviderWithCellReuseIdentifier:@"cellIdentifier"];
+    _provider.collectionViewItemSizeBlock = ^CGSize(UICollectionView * _Nonnull collectionView, NSIndexPath * _Nonnull indexPath) {
+      
+        CGFloat itemWidth = 100;
+        CGFloat itemHeight = 30;
+
+        return CGSizeMake(itemWidth, itemHeight);
+    };
+    
+    _courseCollectionView.delegate = _provider;
+    _courseCollectionView.dataSource = _provider;
+}
+
+- (void)queryData{
+
+    [Request getDataSuccess:^(id responseObject){
+       
+            self.courseCollectionView.delegate = self;
+            self.courseCollectionView.dataSource = self;
+    }];
+}
+//...UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout implementations
+
+- (void)collectionView:(UICollectionView *)collectionView didEndDisplayingCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath{
+    
+    [cell endSomo];
+}
 
 @end
 
 ```
-
-#### Or you can use the *OCGradientContainerView* to intergate with autolayout:
-
-1. Make your view confrom to *OCGradientsOwner* protocol
-2. Use the API    
-
-```ObjC
-@interface UIView (OCGradientsOwner)
-
-- (void)slideToDir:(OCDirection)direction animations:(void (^)(CAAnimationGroup *))group;
-
-- (void)stopSliding;
-
-@end
-
-
-```
-
-Check out the example for more.
-
-
-## 📚 Example
-
-To run the example project, clone the repo, and run `pod install` from the Example directory first.
-
-## 🛠 Installation
-
-OCSkeleton is available through [CocoaPods](http://cocoapods.org). To install
-it, simply add the following line to your Podfile:
-
-```ruby
-pod 'OCSkeleton'
-```
-
-## Author
-
-mayqiyue, xu20121013@gmail.com
-
-## License
-
-OCSkeleton is available under the MIT license. See the LICENSE file for more info.
